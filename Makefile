@@ -16,7 +16,7 @@ debug:		CFLAGS	+= -fsanitize=address -g
 debug:		all
 
 $(NAME) :${OBJS} | tools
-		${CC} -L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKit  -o ${NAME} ${OBJS}
+		${CC} -L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKit -fsanitize=address -g  -o ${NAME} ${OBJS}
 
 tools:
 	make -C ./libft42/
