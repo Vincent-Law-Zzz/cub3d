@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 01:13:51 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/18 19:39:15 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/19 23:06:05 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -366,7 +366,7 @@ void prepare_direction(t_game *game)
 	if (game->player.direction == 0.25)
 		game->player.direction = 0;
 	if (game->player.direction == 0.5)
-		game->player.direction = 1.5 * M_PI;
+		game->player.direction = - M_PI_2;
 	if (game->player.direction == 0.75)
 		game->player.direction = M_PI;
 }
@@ -498,6 +498,7 @@ float ft_vertical(t_game *game,float cos_a,float sin_a)
 {
 	float	depth;
 	float	newY;
+	float	newX;
 	int 	x;
 	char ptr = 'X';
 	t_color	color;
@@ -506,41 +507,58 @@ float ft_vertical(t_game *game,float cos_a,float sin_a)
 
 	while (ptr != '1'&&ptr != '\0')
 	{
-		if (cos_a <= 0)
-			depth = ((x + floor(game->player.xx)) - game->player.xx) / cos_a;
-		else
+		if (cos_a >= 0)
 			depth = (game->player.xx - (x + floor(game->player.xx))) / cos_a;
+		else
+			depth = ((x + floor(game->player.xx)) - game->player.xx) / cos_a;
 		newY = game->player.yy + depth*sin_a;
-		ptr = ft_get_xy(&game->map, (x + floor(game->player.xx)), floor(newY));
+		newX =game->player.xx + depth*cos_a;
+		ptr = ft_get_xy(&game->map, (int)newX, (int)newY);
 		x++;
 	}
 	if (ptr != '\0')
-		print_block_npx(game, color, (int)((x + floor(game->player.xx))*10-4), (int)(floor(newY)*10+4), 2);
+		print_block_npx(game, color, (int)((newX)*10-4), (int)((newY)*10 -4), 2);
 	return (newY);
 }
 
-// float ft_horizontal(t_game *game,float cos_a, float sin_a)
-// {
-// 	float	depth;
-// 	float	new;
-// 	int 	i;
-// 	char ptr = 'X';
-// 	t_color	color;
-// 	ft_make_color(&color,255,255,255);
-// 	return (new);
-// }
+float ft_horizontal(t_game *game,float cos_a, float sin_a)
+{
+	float	depth;
+	float	newY;
+	float	newX;
+	int 	x;
+	char ptr = 'X';
+	t_color	color;
+	x = 0;
+	ft_make_color(&color,255,255,255);
+
+	while (ptr != '1'&&ptr != '\0')
+	{
+		if (sin_a >= 0)
+			depth = (game->player.yy - (x + floor(game->player.yy))) / sin_a;
+		else
+			depth = ((x + floor(game->player.yy)) - game->player.yy) / sin_a;
+		newY = game->player.yy + depth*sin_a;
+		newX = game->player.xx + depth*cos_a;
+		ptr = ft_get_xy(&game->map, (int)newX, (int)newY);
+		x++;
+	}
+	if (ptr != '\0')
+		print_block_npx(game, color, (int)((newX)*10-4), (int)((newY)*10 -4), 2);
+	return (newY);
+}
 void	ft_raycasting(t_game *game)
 {
 	float cos_a;
 	float sin_a;
-	// float newX;
+	float newX;
 	float newY;
 	t_color	color;
 	ft_make_color(&color,255,255,255);
 	cos_a = cos(game->player.direction);
 	sin_a = sin(game->player.direction);
 	newY = ft_vertical(game, cos_a, sin_a);
-	// newY = ft_horizontal(game,cos_a,sin_a);
+	newX = ft_horizontal(game,cos_a,sin_a);
 	// print_block_npx(game, color, (int)(newX*10-2), (int)(i*10-2), 4);
 	// print_block_npx(game, color, (int)(i*10-2), (int)(newY*10-2), 4);
 }
@@ -602,8 +620,8 @@ void ft_player_move(t_game *game)
 	}
 	if (game->event.right)
 	{
-		game->player.xx += cos(dir - M_PI_2) * PLAYER_V;
-		game->player.yy -= sin(dir - M_PI_2) * PLAYER_V;
+		game->player.xx += cos(dir + 1.5*M_PI) * PLAYER_V;
+		game->player.yy -= sin(dir + 1.5*M_PI) * PLAYER_V;
 	}
 }
 
