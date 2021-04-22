@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 01:13:51 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/22 19:32:02 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/23 01:43:27 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -495,179 +495,84 @@ void	ft_minimap(t_game *game)
 	print_block_npx(game, color2, (int)(game->player.xx*10-2.5), (int)(game->player.yy*10-2.5), 5);
 }
 
-// void	ft_vertical(t_game *game, t_vert *vector, float cos_a,float sin_a)
-// {
-// 	float	depth;
-// 	float	newY= 0;
-// 	float	newX;
-// 	int 	x;
-// 	char ptr = '0';
-// 	t_color	color;
-// 	x = 1;
-// 	ft_make_color(&color,255,255,255);
 
-// 	while (ptr != '1'&&ptr != '\0')
-// 	{
-// 		if (cos_a >= 0)
-// 		{
-// 			depth = (game->player.xx - (x + floor(game->player.xx))) / cos_a;
-// 			vector->dirtxtr = 'E';
-// 		}
-// 		else
-// 		{
-// 			depth = ((x + floor(game->player.xx)) - game->player.xx) / cos_a;
-// 			vector->dirtxtr = 'W';
-// 		}
-// 		newY = fabs(game->player.yy + depth * sin_a);
-// 		newX = fabs(game->player.xx + depth * cos_a);
-// 		ptr = ft_get_xy(&game->map, (int)floor(newX), (int)floor(newY));
-// 		x++;
-// 		if (ptr != '\0')
-// 			print_block_npx(game, color, (int)((newX)*10), (int)((newY)*10), 1);
-// 	}
-// 	printf ("vert %d x %d y\n", (int)floor(newX), (int)floor(newY));
-// 	vector->distance = fabs(depth);
-// 	vector->cord = newX;
-// 	printf(" vert txtr %c dist %f cor %f \n", vector->dirtxtr, vector->distance, vector->cord);
-// 	// printf("hor %f", cos_a);
-// 	// return (newY);
-// }
-
-// void	ft_horizontal(t_game *game, t_vert *vector, float cos_a, float sin_a)
-// {
-// 	float	depth;
-// 	float	newY;
-// 	float	newX;
-// 	int 	y;
-// 	char ptr = '0';
-// 	t_color	color;
-// 	y = 1;
-// 	ft_make_color(&color,255,255,255);
-
-// 	while (ptr != '1' && ptr != '\0')
-// 	{
-// 		if (sin_a >= 0)
-// 		{
-// 			depth = (game->player.yy - (y + floor(game->player.yy))) / sin_a;
-// 			vector->dirtxtr = 'N';
-// 		}
-// 		else
-// 		{
-// 			depth = (y + floor(game->player.yy) - game->player.yy) / sin_a;
-// 			vector->dirtxtr = 'S';
-// 		}
-// 		newY = fabs(game->player.yy + depth*sin_a);
-// 		newX = fabs(game->player.xx + depth*cos_a);
-// 		if ((ptr = ft_get_xy(&game->map, (int)floor(newX), (int)floor(newY))) == '1')
-// 			break;
-// 		y++;
-// 		if (ptr != '\0')
-// 			print_block_npx(game, color, (int)((newX)*10), (int)((newY)*10), 1);
-// 	}
-// 	printf ("hor %d x %d y\n", (int)floor(newX), (int)floor(newY));
-// 	vector->distance = fabs(depth);
-// 	vector->cord = newX;
-// 	printf(" hors txtr %c dist %f cor %f \n", vector->dirtxtr, vector->distance, vector->cord);
-// 	// printf("hor %f", sin_a);
-// 	// return (depth);
-// }
-
-float	lod_rcast(t_game *game,t_vert *vector, float cos_a, float sin_a, t_color color)
+void	step_init(t_game *game, float cos_a, float sin_a,t_props *ray)
 {
-	float	deltaX = 0;
-	float	deltaY = 0;
-	int		vert = 0;
-	char	hit = 'x';
-	int		stepX;
-	int		stepY;
-	int 	cosecX = fabs(1/cos_a);
-	int		secY = fabs(1/sin_a);
-	int		xtomap = (int)(game->player.xx);
-	int		ytomap = (int)(game->player.yy);
+	ray->hit = '0';
+	ray->cosec_a = fabs(1/cos_a);
+	ray->sec_a = fabs(1/sin_a);
 	if (cos_a >= 0)
 	{
-		stepX = -1;
-		deltaX = (game->player.xx - xtomap) * cosecX;
+		ray->stepX = -1;
+		ray->depthX = (game->player.xx - ray->xtomap) * ray->cosec_a;
 	}
 	else
 	{ 
-		stepX = 1;
-		deltaX = (xtomap + 1.0 - game->player.xx) * cosecX;
+		ray->stepX = 1;
+		ray->depthX = (ray->xtomap + 1.0 - game->player.xx) * ray->cosec_a;
 	}
 	if (sin_a >= 0)
 	{
-		stepY = -1;
-		deltaY =  (game->player.yy - ytomap) * secY;
+		ray->stepY = -1;
+		ray->depthY =  (game->player.yy - ray->ytomap) * ray->sec_a;
 	}
 	else
 	{
-		stepY = 1;
-		deltaY = (ytomap + 1.0 - game->player.yy) * secY;
+		ray->stepY = 1;
+		ray->depthY = (ray->ytomap + 1.0 - game->player.yy) * ray->sec_a;
 	}
-	while (hit != '1' && hit != '\0')
+}
+
+float	cast_one_ray(t_game *game, t_props *ray)
+{
+	ray->xtomap = (int)(game->player.xx);
+	ray->ytomap = (int)(game->player.yy);
+	while (ray->hit != '1' && ray->hit != '\0')
 	{
 		//jump to next map square, OR in x-direction, OR in y-direction
-		if (deltaX < deltaY)
+		if (ray->depthX < ray->depthY)
 		{
-			deltaX += cosecX;
-			xtomap += stepX;
-			vert = 0;
+			ray->depthX += ray->cosec_a;
+			ray->xtomap += ray->stepX;
+			ray->vert = 0;
 		}
 		else
 		{
-			deltaY += secY;
-			ytomap += stepY;
-			vert = 1;
+			ray->depthY += ray->sec_a;
+			ray->ytomap += ray->stepY;
+			ray->vert = 1;
 		}
-		if (hit != '\0')
-			print_block_npx(game, color, xtomap*10, ytomap*10, 1);
+		// if (hit != '\0')
+		// 	print_block_npx(game, color, xtomap*10, ytomap*10, 1);
 		//Check if ray has hit a wall
-		hit = ft_get_xy(&game->map,xtomap,ytomap);
+		ray->hit = ft_get_xy(&game->map,ray->xtomap,ray->ytomap);
 	}
-		if (stepY > 0 && vert)
-			vector->dirtxtr = 'S';
-		if (stepY < 0 && vert)
-			vector->dirtxtr = 'N';
-		if (stepX >= 0 && !vert)
-			vector->dirtxtr = 'E';
-		if (stepX < 0 && !vert)
-			vector->dirtxtr = 'W';
-		printf("ray x%d y%d dx%f dy%f vert %c\n", xtomap, ytomap, deltaX, deltaY, vector->dirtxtr);
-	return (1);
+	if (ray->depthX > ray->depthY)
+		return (ray->depthY);
+	return (ray->depthX);
 }
 
 void	ft_raycasting(t_game *game, t_vert *vector)
 {
-	float cos_a;
-	float sin_a;
-	// float newX;
-	// float newY;
-	t_color	color;
-	// t_vert vh;
-	// t_vert vw;
-	ft_make_color(&color,255,255,255);
+	t_props	ray;
+	float	cos_a;
+	float	sin_a;
+	
 	cos_a = cos(game->player.direction);
 	sin_a = sin(game->player.direction);
-	// ft_vertical(game,&vw, cos_a, sin_a);
-	// ft_horizontal(game,&vh, cos_a,sin_a);
 
-	lod_rcast(game, vector,cos_a,sin_a, color);
-	// if (vh.distance < vw.distance)
-	// {
-	// 	vector->distance = vh.distance;
-	// 	vector->cord = vh.cord;
-	// 	vector->dirtxtr = vh.dirtxtr;
-	// }
-	// else if (vh.distance > vw.distance)
-	// {
-	// 	vector->distance =vw.distance;
-	// 	vector->cord = vw.cord;
-	// 	vector->dirtxtr = vw.dirtxtr;
-	// }
-	// printf(" ray txtr %c dist %f cor %f \n", vector->dirtxtr, vector->distance, vector->cord);
-	// print_block_npx(game, color, (int)(newX*10-2), (int)(i*10-2), 4);
-	// print_block_npx(game, color, (int)(i*10-2), (int)(newY*10-2), 4);
+	step_init(game, cos_a,sin_a,&ray);
+	vector->distance = cast_one_ray(game, &ray);
+	if (ray.stepY > 0 && ray.vert)
+		vector->dirtxtr = 'S';
+	if (ray.stepY < 0 && ray.vert)
+		vector->dirtxtr = 'N';
+	if (ray.stepX >= 0 && !ray.vert)
+		vector->dirtxtr = 'E';
+	if (ray.stepX < 0 && !ray.vert)
+		vector->dirtxtr = 'W';
 }
+
 int	handle_pressed_key(int keycode, t_game *game)
 {
 	if (keycode == ESC)
@@ -742,13 +647,12 @@ void	ft_event_processing(t_game *game)
 
 int		ft_loop_tick(t_game *game)
 {
-	// t_vert vector[game->param.screen.width];
-	t_vert vector;
+	t_vert vector[game->param.screen.width];
 	
 	ft_event_processing(game); //to do
 	ft_background_rendering(game);
 	ft_minimap(game);
-	ft_raycasting(game, &vector); // to do
+	ft_raycasting(game, vector); // to do
 	//ft_rendering(game,vector); //to do
 	mlx_put_image_to_window(game->mlx,game->window , game->param.screen.mlx_obj , 0, 0);
 	return (0);

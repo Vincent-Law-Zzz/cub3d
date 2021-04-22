@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/18 19:37:28 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/23 00:05:38 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,19 @@ typedef	struct		s_event
 	char			esc;
 }					t_event;
 
+typedef	struct		s_reyprops
+{
+	float	depthX;
+	float	depthY;
+	int		vert;
+	char	hit;
+	int		stepX;
+	int		stepY;
+	int 	cosec_a;
+	int		sec_a;
+	int		xtomap;
+	int		ytomap;
+}					t_props;
 
 typedef	struct		s_vertical 
 {
