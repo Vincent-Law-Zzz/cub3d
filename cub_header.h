@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/23 00:05:38 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/23 11:56:50 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,12 @@ typedef	struct		s_reyprops
 	int		sec_a;
 	int		xtomap;
 	int		ytomap;
+	double	cameraX;
+	double	rayDirX;
+	double	rayDirY;
+	float	planeX;
+	float	planeY;
+	float	dist;
 }					t_props;
 
 typedef	struct		s_vertical 
