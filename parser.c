@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 01:13:51 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/23 20:04:09 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/24 00:05:46 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -496,234 +496,235 @@ void	ft_minimap(t_game *game)
 }
 
 
-void	step_init(t_game *game, float cos_a, float sin_a,t_props *ray)
+// void	step_init(t_game *game, float cos_a, float sin_a,t_props *ray)
+// {
+// 	ray->hit = '0';
+// 	ray->cosec_a = fabs(1/cos_a);
+// 	ray->sec_a = fabs(1/sin_a);
+// 	if (cos_a >= 0)
+// 	{
+// 		ray->stepX = -1;
+// 		ray->depthX = (game->player.xx - ray->xtomap) * ray->cosec_a;
+// 	}
+// 	else
+// 	{ 
+// 		ray->stepX = 1;
+// 		ray->depthX = (ray->xtomap + 1.0 - game->player.xx) * ray->cosec_a;
+// 	}
+// 	if (sin_a >= 0)
+// 	{
+// 		ray->stepY = -1;
+// 		ray->depthY =  (game->player.yy - ray->ytomap) * ray->sec_a;
+// 	}
+// 	else
+// 	{
+// 		ray->stepY = 1;
+// 		ray->depthY = (ray->ytomap + 1.0 - game->player.yy) * ray->sec_a;
+// 	}
+// }
+
+// float	cast_one_ray(t_game *game, t_props *ray, float cos_a, float sin_a)
+// {
+// 	ray->xtomap = (int)(game->player.xx);
+// 	ray->ytomap = (int)(game->player.yy);
+// 	while (ray->hit != '1' && ray->hit != '\0')
+// 	{
+// 		//jump to next map square, OR in x-direction, OR in y-direction
+// 		if (ray->depthX < ray->depthY)
+// 		{
+// 			ray->depthX += ray->cosec_a;
+// 			ray->xtomap += ray->stepX;
+// 			ray->vert = 0;
+// 		}
+// 		else
+// 		{
+// 			ray->depthY += ray->sec_a;
+// 			ray->ytomap += ray->stepY;
+// 			ray->vert = 1;
+// 		}
+// 		// if (hit != '\0')
+// 		// 	print_block_npx(game, color, xtomap*10, ytomap*10, 1);
+// 		//Check if ray has hit a wall
+// 		ray->hit = ft_get_xy(&game->map,ray->xtomap,ray->ytomap);
+// 	}
+// 	if (ray->vert == 1)
+// 			return (fabs((ray->xtomap - game->player.xx + (1 - ray->stepX) / 2) / cos_a));
+// 	return (fabs((ray->ytomap - game->player.yy + (1 - ray->stepY) / 2) / sin_a));
+// }
+
+// void	ft_raycasting(t_game *game, t_vert *vector)
+// {
+// 	t_props	ray;
+// 	float	cos_a;
+// 	float	sin_a;
+// 	float	deltaA;
+// 	float	start;
+// 	int x = 0;
+
+// 	deltaA = M_PI_2 / (float)game->param.screen.width;
+// 	start  = game->player.direction + M_PI_4;
+// 		// cos_a = cos(game->player.direction);
+// 		// sin_a = sin(game->player.direction);
+// 	// ft_rc2(game,&ray ,cos_a,sin_a);
+	
+// 	while (start > game->player.direction - M_PI_4)
+// 	{
+// 		cos_a = cos(start);
+// 		sin_a = sin(start);
+// 		step_init(game, cos_a,sin_a,&ray);
+// 		(vector[x]).distance = cast_one_ray(game, &ray, cos_a, sin_a);
+// 		if (ray.stepY > 0 && ray.vert)
+// 			(vector[x]).dirtxtr = 'S';
+// 		if (ray.stepY < 0 && ray.vert)
+// 			(vector[x]).dirtxtr = 'N';
+// 		if (ray.stepX > 0 && !ray.vert)
+// 			(vector[x]).dirtxtr = 'E';
+// 		if (ray.stepX < 0 && !ray.vert)
+// 			(vector[x]).dirtxtr = 'W';
+// 		printf(" %f  %f\n", vector[x].distance, start);
+// 		start -= deltaA;
+// 		x++;
+// 	}
+// 	// printf(" %f  %f\n", vector[x].distance, start);
+	
+// }
+
+void	verLine(t_game *game, int x, int y1, int y2)
 {
-	ray->hit = '0';
-	ray->cosec_a = fabs(1/cos_a);
-	ray->sec_a = fabs(1/sin_a);
-	if (cos_a >= 0)
+	t_color color;
+	int	y;
+
+	y = y1;
+	ft_make_color(&color, 255, 255, 1);
+	while (y <= y2)
 	{
-		ray->stepX = -1;
-		ray->depthX = (game->player.xx - ray->xtomap) * ray->cosec_a;
-	}
-	else
-	{ 
-		ray->stepX = 1;
-		ray->depthX = (ray->xtomap + 1.0 - game->player.xx) * ray->cosec_a;
-	}
-	if (sin_a >= 0)
-	{
-		ray->stepY = -1;
-		ray->depthY =  (game->player.yy - ray->ytomap) * ray->sec_a;
-	}
-	else
-	{
-		ray->stepY = 1;
-		ray->depthY = (ray->ytomap + 1.0 - game->player.yy) * ray->sec_a;
+		game->param.screen.data[(y)*game->param.screen.width + (x)] = color;
+		y++;
 	}
 }
 
-float	cast_one_ray(t_game *game, t_props *ray, float cos_a, float sin_a)
+void	ft_rc2(t_game *game,t_props *ray )
 {
-	ray->xtomap = (int)(game->player.xx);
-	ray->ytomap = (int)(game->player.yy);
-	while (ray->hit != '1' && ray->hit != '\0')
+	int	x;
+
+	x = 0;
+	while (x < game->param.screen.width)
 	{
-		//jump to next map square, OR in x-direction, OR in y-direction
-		if (ray->depthX < ray->depthY)
+		ray->cameraX = 2 * x / (double)game->param.screen.width - 1;
+		ray->rayDirX = ray->dirX + ray->planeX * ray->cameraX;
+		ray->rayDirY = ray->dirY + ray->planeY * ray->cameraX;
+		
+		ray->xtomap = (int)game->player.xx;
+		ray->ytomap = (int)game->player.yy;
+
+		//length of ray from current position to next x or y-side
+		
+		 //length of ray from one x or y-side to next x or y-side
+		ray->cosec_a = fabs(1 / ray->rayDirX);
+		ray->sec_a = fabs(1 / ray->rayDirY);
+	
+		
+		//what direction to step in x or y-direction (either +1 or -1)
+		
+		ray->hit = '0'; //was there a wall hit?	was a NS or a EW wall hit?
+
+		if (ray->rayDirX < 0)
 		{
-			ray->depthX += ray->cosec_a;
-			ray->xtomap += ray->stepX;
-			ray->vert = 0;
+			ray->stepX = -1;
+			ray->depthX = (game->player.xx - ray->xtomap) * ray->cosec_a;
 		}
 		else
 		{
-			ray->depthY += ray->sec_a;
-			ray->ytomap += ray->stepY;
-			ray->vert = 1;
+			ray->stepX = 1;
+			ray->depthX = (ray->xtomap + 1.0 - game->player.xx) * ray->cosec_a;
 		}
-		// if (hit != '\0')
-		// 	print_block_npx(game, color, xtomap*10, ytomap*10, 1);
-		//Check if ray has hit a wall
-		ray->hit = ft_get_xy(&game->map,ray->xtomap,ray->ytomap);
-	}
-	if (ray->vert == 0)
-			return (((ray->xtomap - game->player.xx + (1 - ray->stepX) / 2) / cos_a));
-	return (((ray->ytomap - game->player.yy + (1 - ray->stepY) / 2) / sin_a));
-}
+		if (ray->rayDirY < 0)
+		{
+			ray->stepY = -1;
+			ray->depthY = (game->player.yy - ray->ytomap) * ray->sec_a;
+		}
+		else
+		{
+			ray->stepY = 1;
+			ray->depthY = (ray->ytomap + 1.0 - game->player.yy) * ray->sec_a;
+		}
 
-void	ft_raycasting(t_game *game, t_vert *vector)
-{
-	t_props	ray;
-	float	cos_a;
-	float	sin_a;
-	float	deltaA;
-	float	start;
-	int x = 0;
+		while (ray->hit == '0' || ray->hit == '2')
+		{
+			//jump to next map square, OR in x-direction, OR in y-direction
+			if (ray->depthX < ray->depthY)
+			{
+				ray->depthX += ray->cosec_a;
+				ray->xtomap += ray->stepX;
+				ray->vert = 0;
+			}
+			else
+			{
+				ray->depthY += ray->sec_a;
+				ray->ytomap += ray->stepY;
+				ray->vert = 1;
+			}
+			//Check if ray has hit a wall
+			ray->hit = ft_get_xy(&game->map,ray->xtomap, ray->ytomap);
+		}
+		if (ray->vert == 0)
+			ray->dist = (ray->xtomap - game->player.xx + (1 - ray->stepX) / 2) / ray->rayDirX;
+		else
+			ray->dist = (ray->ytomap - game->player.yy + (1 - ray->stepY) / 2) / ray->rayDirY;
 
-	deltaA = M_PI_2 / (float)game->param.screen.width;
-	start  = game->player.direction + M_PI_4;
-	// 	cos_a = cos(game->player.direction);
-	// 	sin_a = sin(game->player.direction);
-	// ft_rc2(game,&ray ,cos_a,sin_a);
-	while (start < game->player.direction - M_PI_4)
-	{
-		cos_a = cos(start);
-		sin_a = sin(start);
-		step_init(game, cos_a,sin_a,&ray);
-		(vector[x]).distance = cast_one_ray(game, &ray, cos_a, sin_a);
-		if (ray.stepY > 0 && ray.vert)
-			(vector[x]).dirtxtr = 'S';
-		if (ray.stepY < 0 && ray.vert)
-			(vector[x]).dirtxtr = 'N';
-		if (ray.stepX >= 0 && !ray.vert)
-			(vector[x]).dirtxtr = 'E';
-		if (ray.stepX < 0 && !ray.vert)
-			(vector[x]).dirtxtr = 'W';
-		start -= deltaA;
-		printf(" %f ", vector[x].distance);
-		x++;
-	}
-	printf("\n");
-}
-
-// void	verLine(t_game *game, int x, int y1, int y2)
-// {
-// 	t_color color;
-// 	int	y;
-
-// 	y = y1;
-// 	ft_make_color(&color, 255, 255, 1);
-// 	while (y <= y2)
-// 	{
-// 		game->param.screen.data[(y)*game->param.screen.width + (x)] = color;
-// 		y++;
-// 	}
-// }
-// void	ft_rc2(t_game *game,t_props *ray , __unused float cos_a, __unused float sin_a)
-// {
-
-// 	int	x;
-// 	ray->planeX = -M_PI/4;
-// 	ray->planeY = 0;
-// 	x = 0;
-// 	while (x < game->param.screen.width)
-// 	{
-// 		// ray->cameraX = 2 * x / (double)game->param.screen.width - 1;
-// 		// ray->rayDirX = 0+ ray->planeX * ray->cameraX;
-// 		// ray->rayDirY = -1 + ray->planeY * ray->cameraX;
-		
-// 		ray->xtomap = (int)game->player.xx;
-// 		ray->ytomap = (int)game->player.yy;
-
-// 		//length of ray from current position to next x or y-side
-		
-		
-// 		 //length of ray from one x or y-side to next x or y-side
-// 		ray->cosec_a = fabs(1 / ray->rayDirX);
-// 		ray->sec_a = fabs(1 / ray->rayDirY);
-		
-// 		//what direction to step in x or y-direction (either +1 or -1)
-		
-// 		ray->hit = 0; //was there a wall hit?
-// 		//was a NS or a EW wall hit?
-
-// 		if (ray->rayDirX >= 0)
-// 		{
-// 			ray->stepX = -1;
-// 			ray->depthX = (game->player.xx - ray->xtomap) * ray->cosec_a;
-// 		}
-// 		else
-// 		{
-// 			ray->stepX = 1;
-// 			ray->depthX = (ray->xtomap + 1.0 - game->player.xx) * ray->cosec_a;
-// 		}
-// 		if (ray->rayDirY >= 0)
-// 		{
-// 			ray->stepY = -1;
-// 			ray->depthY = (game->player.yy - ray->ytomap) * ray->sec_a;
-// 		}
-// 		else
-// 		{
-// 			ray->stepY = 1;
-// 			ray->depthY = (ray->ytomap + 1.0 - game->player.yy) * ray->sec_a;
-// 		}
-
-// 		while (ray->hit != '1' && ray->hit != '\0')
-// 		{
-// 			//jump to next map square, OR in x-direction, OR in y-direction
-// 			if (ray->depthX < ray->depthY)
-// 			{
-// 				ray->depthX += ray->cosec_a;
-// 				ray->xtomap += ray->stepX;
-// 				ray->vert = 0;
-// 			}
-// 			else
-// 			{
-// 				ray->depthY += ray->sec_a;
-// 				ray->ytomap += ray->stepY;
-// 				ray->vert = 1;
-// 			}
-// 			//Check if ray has hit a wall
-// 			ray->hit = ft_get_xy(&game->map,ray->xtomap,ray->ytomap);
-// 		}
-// 		if (ray->vert == 0)
-// 			ray->dist = (ray->xtomap - game->player.xx + (1 - ray->stepX) / 2) / ray->rayDirX;
-// 		else
-// 			ray->dist = (ray->ytomap - game->player.yy + (1 - ray->stepY) / 2) / ray->rayDirY;
-
-// 		//Calculate height of line to draw on screen
-// 		int lineHeight = (int)((game->param.screen.height / ray->dist));
-
-// 		//calculate lowest and highest pixel to fill in current stripe
-// 		int drawStart = -lineHeight / 2 + game->param.screen.height / 2;
-// 		if(drawStart < 0)
-// 			drawStart = 0;
-// 		int drawEnd = lineHeight / 2 + game->param.screen.height / 2;
-// 		if(drawEnd >= game->param.screen.height)
-// 			drawEnd = game->param.screen.height - 1;
-// 		verLine(game, x, drawStart, drawEnd);
-// 		x++;
-// 	}
-// }
-
-void ft_rendering(t_game *game, t_vert *vector)
-{
-	int		xx;
-	int		yy;
-	double	arctg_a;
-	int		pixcount;
-	int		start;
-	t_color color;
-	ft_make_color(&color,233,200,125);
-	xx = 0;
-	while (xx < game->param.screen.width)
-	{
-			//Calculate height of line to draw on screen
-		// int lineHeight = (int)(game->param.screen.height / vector[xx].distance);
+		//Calculate height of line to draw on screen
+		int lineHeight = (int)(game->param.screen.height / ray->dist);
 
 		//calculate lowest and highest pixel to fill in current stripe
-		// int drawStart = -lineHeight / 2 + game->param.screen.height / 2;
-		// if(drawStart < 0)
-		// 	drawStart = 0;
-		// int drawEnd = lineHeight / 2 + game->param.screen.height / 2;
-		// if(drawEnd >= game->param.screen.height)
-		// 	drawEnd = game->param.screen.height - 1;
-		arctg_a = atan(0.5 / vector[xx].distance) * 2/ (M_PI / 4);
-		pixcount = game->param.screen.height * arctg_a;
-		start = (game->param.screen.height - pixcount) / 2;
-		yy = 0;
-		while (start < game->param.screen.height /2 + pixcount)
-		{
-			if (start > 0 && start < game->param.screen.height)
-				game->param.screen.data[(start)*game->param.screen.width + (xx)] = color;
-			// start++;
-			start++;
-			yy++;
-		}
-		xx++;
-	} 
+		int drawStart = (game->param.screen.height - lineHeight) / 2;
+		if(drawStart < 0)
+			drawStart = 0;
+		int drawEnd = (lineHeight + game->param.screen.height) / 2;
+		if(drawEnd >= game->param.screen.height)
+			drawEnd = game->param.screen.height - 1;
+
+		verLine(game, x, drawStart, drawEnd);
+		x++;
+	}
 }
+
+// void ft_rendering(t_game *game, t_vert *vector)
+// {
+// 	int		xx;
+// 	int		yy;
+// 	double	arctg_a;
+// 	int		pixcount;
+// 	int		start;
+// 	t_color color;
+// 	ft_make_color(&color,233,200,125);
+// 	xx = 0;
+// 	while (xx < game->param.screen.width)
+// 	{
+// 			//Calculate height of line to draw on screen
+// 		// int lineHeight = (int)(game->param.screen.height / vector[xx].distance);
+
+// 		//calculate lowest and highest pixel to fill in current stripe
+// 		// int drawStart = -lineHeight / 2 + game->param.screen.height / 2;
+// 		// if(drawStart < 0)
+// 		// 	drawStart = 0;
+// 		// int drawEnd = lineHeight / 2 + game->param.screen.height / 2;
+// 		// if(drawEnd >= game->param.screen.height)
+// 		// 	drawEnd = game->param.screen.height - 1;
+// 		arctg_a = atan(0.5 / vector[xx].distance) * 2/ (M_PI / 3);
+// 		pixcount = game->param.screen.height * arctg_a;
+// 		start = (game->param.screen.height - pixcount) / 2;
+// 		yy = 0;
+// 		while (yy < pixcount)
+// 		{
+// 			if (start > 0 && start < game->param.screen.height)
+// 				game->param.screen.data[(start)*game->param.screen.width + (xx)] = color;
+// 			// start++;
+// 			start++;
+// 			yy++;
+// 		}
+// 		xx++;
+// 	} 
+// }
 
 int	handle_pressed_key(int keycode, t_game *game)
 {
@@ -799,17 +800,17 @@ void	ft_event_processing(t_game *game)
 
 int		ft_loop_tick(t_game *game)
 {
-	t_vert vector[game->param.screen.width];
-	// t_props	ray;
-	// float	cos_a;
-	// float	sin_a;
+	// t_vert vector[game->param.screen.width];
+	t_props	ray;
+	float	cos_a;
+	float	sin_a;
 	ft_event_processing(game); //to do
 	ft_background_rendering(game);
-	 ft_raycasting(game, vector); // to do
-	ft_rendering(game,vector); //to do
-	// cos_a = cos(game->player.direction);
-	// sin_a = sin(game->player.direction);
-	// ft_rc2(game,&ray ,cos_a,sin_a);
+	// ft_raycasting(game, vector); // to do
+	// ft_rendering(game,vector); //to do
+	cos_a = cos(game->player.direction);
+	sin_a = sin(game->player.direction);
+	ft_rc2(game,&ray);
 	ft_minimap(game);
 	mlx_put_image_to_window(game->mlx,game->window , game->param.screen.mlx_obj , 0, 0);
 	return (0);

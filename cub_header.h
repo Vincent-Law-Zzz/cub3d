@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/23 11:56:50 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/23 23:38:37 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,8 @@ typedef	struct		s_reyprops
 	double	cameraX;
 	double	rayDirX;
 	double	rayDirY;
+	double	dirX;
+	double	dirY;
 	float	planeX;
 	float	planeY;
 	float	dist;
