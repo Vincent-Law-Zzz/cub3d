@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/23 23:38:37 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/24 04:08:44 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,5 +127,6 @@ typedef struct		s_game
 	void			*mlx;
 	void			*window;
 	t_event			event;
+	t_props			ray;
 }					t_game;
 #endif

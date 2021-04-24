@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/17 01:13:51 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/24 00:05:46 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/24 09:18:05 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,11 +362,11 @@ void	ft_checktop(t_game *game)
 void prepare_direction(t_game *game)
 {
 	if (game->player.direction == 0)
-		game->player.direction = M_PI_2;
+		game->player.direction = -M_PI_2;
 	if (game->player.direction == 0.25)
 		game->player.direction = 0;
 	if (game->player.direction == 0.5)
-		game->player.direction = - M_PI_2;
+		game->player.direction = M_PI_2;
 	if (game->player.direction == 0.75)
 		game->player.direction = M_PI;
 }
@@ -589,13 +589,11 @@ void	ft_minimap(t_game *game)
 	
 // }
 
-void	verLine(t_game *game, int x, int y1, int y2)
+void	verLine(t_game *game, int x, int y1, int y2, t_color color)
 {
-	t_color color;
 	int	y;
 
 	y = y1;
-	ft_make_color(&color, 255, 255, 1);
 	while (y <= y2)
 	{
 		game->param.screen.data[(y)*game->param.screen.width + (x)] = color;
@@ -606,8 +604,11 @@ void	verLine(t_game *game, int x, int y1, int y2)
 void	ft_rc2(t_game *game,t_props *ray )
 {
 	int	x;
+	t_color color;
 
 	x = 0;
+	ray->planeX = 0;
+	ray->planeY = -0.66;
 	while (x < game->param.screen.width)
 	{
 		ray->cameraX = 2 * x / (double)game->param.screen.width - 1;
@@ -676,14 +677,15 @@ void	ft_rc2(t_game *game,t_props *ray )
 		int lineHeight = (int)(game->param.screen.height / ray->dist);
 
 		//calculate lowest and highest pixel to fill in current stripe
-		int drawStart = (game->param.screen.height - lineHeight) / 2;
+		int drawStart = game->param.screen.height/ 2 - lineHeight/2;
 		if(drawStart < 0)
 			drawStart = 0;
-		int drawEnd = (lineHeight + game->param.screen.height) / 2;
+		int drawEnd = lineHeight/2 + game->param.screen.height/ 2;
 		if(drawEnd >= game->param.screen.height)
 			drawEnd = game->param.screen.height - 1;
-
-		verLine(game, x, drawStart, drawEnd);
+		ft_make_color(&color, 255, 255, 1);
+		verLine(game, x, drawStart, drawEnd, color);
+		ft_bzero(ray,sizeof(ray));
 		x++;
 	}
 }
@@ -762,20 +764,28 @@ int	handle_unpressed_key(int keycode, t_game *game)
 	return (0);
 }
 
-void ft_player_move(t_game *game)
+void ft_player_move(t_game *game, t_props *ray)
 {
 	float dir;
 
 	dir = game->player.direction;
 	if (game->event.up)
 	{
-		game->player.xx += -cos(dir) * PLAYER_V;
-		game->player.yy += -sin(dir) * PLAYER_V;
+		// game->player.xx += -cos(dir) * PLAYER_V;
+		// game->player.yy += -sin(dir) * PLAYER_V;
+		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + ray->dirX * PLAYER_V),(int)(game->player.yy))))
+			game->player.xx += ray->dirX * PLAYER_V;
+		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy + ray->dirY * PLAYER_V))))
+			game->player.yy += ray->dirY * PLAYER_V;
 	}
 	if (game->event.down)
 	{
-		game->player.xx += cos(dir) * PLAYER_V;
-		game->player.yy += sin(dir) * PLAYER_V;
+		// game->player.xx += cos(dir) * PLAYER_V;
+		// game->player.yy += sin(dir) * PLAYER_V;
+		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx - ray->dirX * PLAYER_V),(int)(game->player.yy))))
+			game->player.xx -= ray->dirX * PLAYER_V;
+		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy - ray->dirY * PLAYER_V))))
+			game->player.yy -= ray->dirY * PLAYER_V;
 	}
 	if (game->event.left)
 	{
@@ -789,28 +799,39 @@ void ft_player_move(t_game *game)
 	}
 }
 
-void	ft_event_processing(t_game *game)
+void	ft_event_processing(t_game *game, t_props *ray)
 {
-	ft_player_move(game); //todo: условие ограничивающее хождение сквозь стены
+	ft_player_move(game, ray); //todo: условие ограничивающее хождение сквозь стены
 	if (game->event.q)
-		game->player.direction -= 1 * ROT_V;
+	{
+		// game->player.direction -= 1 * ROT_V;
+		double oldDirX = ray->dirX;
+		ray->dirX = ray->dirX * cos(-ROT_V) - ray->dirY * sin(-ROT_V);
+		ray->dirY = oldDirX * sin(-ROT_V) + ray->dirY * cos(-ROT_V);
+		double oldPlaneX = ray->planeX;
+		ray->planeX = ray->planeX * cos(-ROT_V) - ray->planeY * sin(-ROT_V);
+		ray->planeY = oldPlaneX * sin(-ROT_V) + ray->planeY * cos(-ROT_V);
+	}
 	if (game->event.e)
-		game->player.direction += 1 * ROT_V;
+	{
+		// game->player.direction += 1 * ROT_V;
+		double oldDirX = ray->dirX;
+		ray->dirX = ray->dirX * cos(ROT_V) - ray->dirY * sin(ROT_V);
+		ray->dirY = oldDirX * sin(ROT_V) + ray->dirY * cos(ROT_V);
+		double oldPlaneX = ray->planeX;
+		ray->planeX = ray->planeX * cos(ROT_V) - ray->planeY * sin(ROT_V);
+		ray->planeY = oldPlaneX * sin(ROT_V) + ray->planeY * cos(ROT_V);
+	}
 }
 
 int		ft_loop_tick(t_game *game)
 {
 	// t_vert vector[game->param.screen.width];
-	t_props	ray;
-	float	cos_a;
-	float	sin_a;
-	ft_event_processing(game); //to do
+	ft_event_processing(game, &game->ray); //to do
 	ft_background_rendering(game);
 	// ft_raycasting(game, vector); // to do
 	// ft_rendering(game,vector); //to do
-	cos_a = cos(game->player.direction);
-	sin_a = sin(game->player.direction);
-	ft_rc2(game,&ray);
+	ft_rc2(game,&game->ray);
 	ft_minimap(game);
 	mlx_put_image_to_window(game->mlx,game->window , game->param.screen.mlx_obj , 0, 0);
 	return (0);
@@ -826,6 +847,8 @@ int		main(void)
 	ft_txtr_procesing(&game);
 	ft_screenshot(&game);
 	game.window = mlx_new_window(game.mlx, game.param.screen.width, game.param.screen.height, "Sanya Cub");
+	game.ray.dirX = cos(game.player.direction);
+	game.ray.dirY = sin(game.player.direction);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_hook(game.window, 2, 0, handle_pressed_key, &game);
 	mlx_loop_hook(game.mlx, ft_loop_tick, &game);
