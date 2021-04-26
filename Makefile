@@ -4,11 +4,17 @@ NAME = cub3D
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror
+INCLUDES =	-I ./includes/ -I ./libft42/ -I ./mlx/
 
-SRCS = 	parser.c
+LIBS_ADD =	-L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKit
 
-OBJS = ${SRCS:.c=.o}
+CFLAGS = -Wall -Wextra -Werror ${INCLUDES}
+
+SRCS = 	$(addprefix ./src/,\
+				main.c parsing.c event.c raycasting.c rendering.c\
+		)
+
+OBJS = $(SRCS:.c=.o)
 
 all: ${NAME}
 
@@ -16,11 +22,12 @@ debug:		CFLAGS	+= -fsanitize=address -g
 debug:		all
 
 $(NAME) :${OBJS} | tools
-		${CC} -L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKit -fsanitize=address -g  -o ${NAME} ${OBJS}
+		${CC} ${CFLAGS} -o ${NAME} ${OBJS} ${LIBS_ADD}
 
 tools:
 	make -C ./libft42/
 	make -C ./mlx/
+
 clean:
 		rm -f ${OBJS}
 
