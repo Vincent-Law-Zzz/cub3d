@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
+/*   By: telron <telron@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 02:11:39 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/25 13:24:39 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/27 07:43:53 by telron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,6 +227,8 @@ void	ft_map_creation(t_game *game)
 		xx = 0;
 		while((cell = ((char *)tmp->content)[xx]))
 		{
+			if (cell == '2')
+				ft_sprite_init(game, xx, yy);
 			if ((ptr = ft_strchr(dir, cell)))
 			{
 				if (game->player.xx)

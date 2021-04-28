@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub_header.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
+/*   By: telron <telron@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/25 15:47:52 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/27 07:44:13 by telron           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,13 @@ typedef	struct		s_vertical
 	char			dirtxtr;
 }					t_vector;
 
+typedef	struct		s_sprite
+{
+	t_list			move;
+	t_vector		vector;
+}					t_sprite;
+
+
 typedef struct		s_game
 {
 	t_param			param;
@@ -112,6 +119,7 @@ typedef struct		s_game
 	void			*mlx;
 	void			*window;
 	t_event			event;
+	t_list			*sprite;
 }					t_game;
 
 void 	ft_make_color(t_color *color,int r, int g, int b);
@@ -129,7 +137,9 @@ void	ft_event_processing(t_game *game);
 void	ft_background_rendering(t_game *game);
 
 void	ft_txtr_procesing(t_game *game);
+
 int		pars_processing(t_game *game);
+
 void	ft_screen_image(t_game *game);
 
 char	ft_get_xy(t_map *map,int x,int y);
@@ -139,5 +149,17 @@ void	ft_raycasting(t_game *game, t_vector *vector);
 void	ft_rendering(t_game *game, t_vector *vector);
 
 int		ft_exit(t_game __attribute__((unused)) *game, char *s, int mode);
+
+float	ft_get_distance(t_cord *dest, t_cord *source);
+
+void	ft_sprite_preprocessing(t_game *game);
+
+void	ft_sprite_rendering(t_game *game, t_vector *vector);
+
+void 	ft_sprite_init(t_game *game, int xx, int yy);
+
+int		ft_cmp_sprite(t_sprite *sprite1, t_sprite *sprite2);
+
+t_color	ft_get_pixel(t_game *game, char dirtxtr, float xx_otn, float yy_otn);
 
 #endif
