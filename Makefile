@@ -8,10 +8,10 @@ INCLUDES =	-I ./includes/ -I ./libft42/ -I ./mlx/
 
 LIBS_ADD =	-L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKit
 
-CFLAGS = -Wall -Wextra -Werror -g ${INCLUDES}
+CFLAGS = -Wall -Wextra -Werror -O3 ${INCLUDES}
 
 SRCS = 	$(addprefix ./src/,\
-				main.c parsing.c event.c raycasting.c rendering.c sprites.c\
+				main.c parsing.c event.c raycasting.c rendering.c sprites.c screen.c minimap.c\
 		)
 
 OBJS = $(SRCS:.c=.o)

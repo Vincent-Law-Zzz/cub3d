@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub_header.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: telron <telron@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/27 07:44:13 by telron           ###   ########.fr       */
+/*   Updated: 2021/04/29 18:19:38 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <math.h>
 
 # define PLAYER_V 0.05
-# define ROT_V 0.005
+# define ROT_V 0.01
 
 # define ESC 53
 # define KEY_W 13
@@ -30,6 +30,10 @@
 # define KEY_E 14
 # define KEY_LEFT 123
 # define KEY_RIGHT 124
+
+# define arrf {{"NO ", ft_cpath, &game->param.pth_no}, {"SO ", ft_cpath, &game->param.pth_so},	\
+	{"WE ", ft_cpath, &game->param.pth_we} , {"EA ", ft_cpath, &game->param.pth_ea}, {"S ", ft_cpath, &game->param.pth_s},	\
+	{"F ", ft_pars_color, &game->param.floor}, {"C ", ft_pars_color, &game->param.ceil}, {"R ", ft_pars_screen, 0}, {0, 0, 0}}
 
 typedef struct		s_color
 {
@@ -81,6 +85,12 @@ typedef	struct		s_cord
 	float 			direction;
 }					t_cord;
 
+typedef	struct		s_icord
+{
+	int 			xx;
+	int 			yy;
+}					t_icord;
+
 typedef	struct		s_line
 {
 	t_cord 			dot[2];
@@ -110,16 +120,18 @@ typedef	struct		s_sprite
 	t_vector		vector;
 }					t_sprite;
 
-
 typedef struct		s_game
 {
 	t_param			param;
 	t_map			map;
 	t_cord			player;
+	char			*path_map;
 	void			*mlx;
 	void			*window;
 	t_event			event;
 	t_list			*sprite;
+	t_vector		*vectors;
+	float			stop;
 }					t_game;
 
 void 	ft_make_color(t_color *color,int r, int g, int b);
@@ -161,5 +173,9 @@ void 	ft_sprite_init(t_game *game, int xx, int yy);
 int		ft_cmp_sprite(t_sprite *sprite1, t_sprite *sprite2);
 
 t_color	ft_get_pixel(t_game *game, char dirtxtr, float xx_otn, float yy_otn);
+
+void	ft_bmp_create(t_game *game);
+
+void	ft_minimap(t_game *game);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 02:11:34 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/28 04:58:36 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/29 20:37:05 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	handle_pressed_key(int keycode, t_game *game)
 {
 	if (keycode == ESC)
-		ft_exit(game," game over ", 0);
+		ft_exit(game, " game over ", 0);
 	if (keycode == KEY_W)
 		game->event.up = 1;
 	if (keycode == KEY_S)
@@ -24,10 +24,13 @@ int	handle_pressed_key(int keycode, t_game *game)
 		game->event.left = 1;
 	if (keycode == KEY_D)
 		game->event.right = 1;
-	if (keycode == KEY_LEFT || keycode == KEY_Q)
+	if ((keycode == KEY_LEFT || keycode == KEY_Q) && !game->event.left)
 		game->event.q = 1;
-	if (keycode == KEY_RIGHT || keycode == KEY_E)
+	if ((keycode == KEY_RIGHT || keycode == KEY_E) && !game->event.right)
 		game->event.e = 1;
+	if ((game->event.down || game->event.left || game->event.right) \
+		&& !game->event.up)
+		game->stop = 0;
 	return (0);
 }
 
@@ -48,92 +51,46 @@ int	handle_unpressed_key(int keycode, t_game *game)
 	return (0);
 }
 
-void ft_player_move(t_game *game)
+void	ft_player_move(t_game *game)
 {
-	float dir;
+	float	dir;
+	float	xx_delta;
+	float	yy_delta;
 
 	dir = game->player.direction;
-	if (game->event.up)
+	xx_delta = (1 - game->stop) * cos((dir - 0.25) * M_PI * 2) * PLAYER_V * \
+		(game->event.up - game->event.down);
+	yy_delta = (1 - game->stop) * sin((dir - 0.25) * M_PI * 2) * PLAYER_V * \
+		(game->event.up - game->event.down);
+	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta), \
+		(int)(game->player.yy + yy_delta)) == '0')
 	{
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + cos((dir - 0.25) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.xx += cos((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.xx -= cos((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + sin((dir - 0.25) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.yy += sin((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.yy -= sin((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + ray->dirX * PLAYER_V),(int)(game->player.yy))))
-		// 	game->player.xx += ray->dirX * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy + ray->dirY * PLAYER_V))))
-		// 	game->player.yy += ray->dirY * PLAYER_V;
+		game->player.xx += xx_delta;
+		game->player.yy += yy_delta;
 	}
-	if (game->event.down)
+	xx_delta = (1 - game->stop) * cos((dir - 0.5) * M_PI * 2) * PLAYER_V * \
+		(game->event.left - game->event.right);
+	yy_delta = (1 - game->stop) * sin((dir - 0.5) * M_PI * 2) * PLAYER_V * \
+		(game->event.left - game->event.right);
+	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta), \
+		(int)(game->player.yy + yy_delta)) == '0')
 	{
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx - cos((dir - 0.25) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.xx -= cos((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.xx += cos((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx - sin((dir - 0.25) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.yy -= sin((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.yy += sin((dir - 0.25) * M_PI * 2) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx - ray->dirX * PLAYER_V),(int)(game->player.yy))))
-		// 	game->player.xx -= ray->dirX * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy - ray->dirY * PLAYER_V))))
-		// 	game->player.yy -= ray->dirY * PLAYER_V;
-	}
-	if (game->event.left)
-	{
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + cos((dir - 0.5) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.xx += cos((dir - 0.5) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.xx -= cos((dir - 0.5) * M_PI * 2) * PLAYER_V;
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + sin((dir - 0.5) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.yy += sin((dir - 0.5) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.yy -= sin((dir - 0.5) * M_PI * 2) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + cos(dir + M_PI_2) * PLAYER_V),(int)(game->player.yy))))
-		// 	game->player.xx += cos(dir + M_PI_2) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy + sin(dir + M_PI_2) * PLAYER_V))))
-		// 	game->player.yy += sin(dir + M_PI_2) * PLAYER_V;
-	}
-	if (game->event.right)
-	{	
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + cos((dir) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.xx += cos((dir) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.xx -= cos((dir) * M_PI * 2) * PLAYER_V;
-		if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + sin((dir) * M_PI * 2) * PLAYER_V),(int)(game->player.yy))))
-			game->player.yy += sin((dir) * M_PI * 2) * PLAYER_V;
-		else
-			game->player.yy -= sin((dir) * M_PI * 2) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx + cos(dir - M_PI_2) * PLAYER_V),(int)(game->player.yy))))
-		// 	game->player.xx += cos(dir - M_PI) * PLAYER_V;
-		// if (ft_strchr("02",ft_get_xy(&game->map,(int)(game->player.xx),(int)(game->player.yy + sin(dir + 1.5 * M_PI_2) * PLAYER_V))))
-		// 	game->player.yy += sin(dir - M_PI) * PLAYER_V;
+		game->player.xx += xx_delta;
+		game->player.yy += yy_delta;
 	}
 }
 
 void	ft_event_processing(t_game *game)
 {
-	ft_player_move(game); //todo: условие ограничивающее хождение сквозь стены
-	// double oldDirX = ray->dirX;
-	// double oldPlaneX = ray->planeX;
+	ft_player_move(game);
 	if (game->event.q)
 	{
 		game->player.direction = ft_to_diap(game->player.direction - ROT_V);
-		// ray->dirX = ray->dirX * cos(-ROT_V) - ray->dirY * sin(-ROT_V);
-		// ray->dirY = oldDirX * sin(-ROT_V) + ray->dirY * cos(-ROT_V);
-		// ray->planeX = ray->planeX * cos(-ROT_V) - ray->planeY * sin(-ROT_V);
-		// ray->planeY = oldPlaneX * sin(-ROT_V) + ray->planeY * cos(-ROT_V);
+		game->stop = 0;
 	}
 	if (game->event.e)
 	{
 		game->player.direction = ft_to_diap(game->player.direction + ROT_V);
-		// ray->dirX = ray->dirX * cos(ROT_V) - ray->dirY * sin(ROT_V);
-		// ray->dirY = oldDirX * sin(ROT_V) + ray->dirY * cos(ROT_V);
-		// ray->planeX = ray->planeX * cos(ROT_V) - ray->planeY * sin(ROT_V);
-		// ray->planeY = oldPlaneX * sin(ROT_V) + ray->planeY * cos(ROT_V);
+		game->stop = 0;
 	}
 }
