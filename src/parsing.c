@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 02:11:39 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 16:18:44 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/30 02:15:54 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ void	ft_pars_color(t_game *game, char *str, t_color *color)
 {
 	char	**res;
 
+	if (color->attributes)
+		ft_exit(game, "colore is parsed", 1);
 	res = ft_split(str, ',');
 	if (!(res) || color->attributes || (ft_strcount(res) != 3))
 	{
@@ -85,6 +87,8 @@ void	ft_pars_color(t_game *game, char *str, t_color *color)
 
 void	ft_cpath(t_game *game, char *str, void **var)
 {
+	if (*var)
+		ft_exit(game, "double texture", 1);
 	*var = ft_strdup(str);
 	if (!(*var))
 		ft_exit(game, "memory is not allocated in ft_cpath", 1);
@@ -107,6 +111,8 @@ void	ft_pars_screen(t_game *game, char *str)
 	int	i;
 
 	i = 0;
+	if (game->param.screen.width || game->param.screen.height)
+		ft_exit(game, "screen is parsed", 1);
 	while (ft_isdigit(str[i]))
 	{
 		game->param.screen.width = game->param.screen.width \
@@ -153,13 +159,12 @@ void	def_param_type(t_game *game, char *str)
 	{
 		if (!ft_strncmp(*arr[counter], str, ft_strlen(*arr[counter])))
 		{
-			((void (*)(t_game *, char *, void *))arr[counter][1])(game, \
-				str + ft_strlen(*arr[counter]), arr[counter][2]);
+			((void (*)(t_game *, char *, void *))arr[counter][1])(game, str + ft_strlen(*arr[counter]), arr[counter][2]);
 			return ;
 		}	
 		counter++;
 	}
-	ft_exit(game, str, 1);
+	ft_exit(game, "set the attributes", 1);
 }
 
 int	ft_ismap(t_game *game)
@@ -175,16 +180,15 @@ void	pars_param(t_game *game, int fd)
 {
 	char	*line;
 
-	while (!(game->param.ismap) && !game->param.error && \
-		get_next_line(fd, &line))
+	while (!ft_ismap(game) && get_next_line(fd, &line))
 	{
-		game->param.ismap = ft_ismap(game);
 		if (*line == '\0')
 		{
 			free(line);
 			continue ;
 		}
-		def_param_type(game, line);
+		if (!ft_ismap(game))
+			def_param_type(game, line);
 	}
 }
 
@@ -230,14 +234,14 @@ void	ft_parsmap(t_game *game, int fd)
 			game->map.width = width;
 	}
 	if (end == -1)
-		ft_exit(game, "OSHIBKA GNL -1 BLYAT", 1);
+		ft_exit(game, "GNL error", 1);
 	game->map.height = ft_lstsize(game->map.list);
 }
 
 void	ft_pars_pl_pos(t_game *game, t_cord cord, char *ptr, char *dir)
 {
 	if (game->player.xx)
-		ft_exit(game, "Error", 1);
+		ft_exit(game, "more than one player", 1);
 	game->player.direction = ((float)(ptr - dir)) / 4;
 	game->map.data[(int)(cord.xx + cord.yy * game->map.width)] = '0';
 	game->player.xx = cord.xx + 0.5;
@@ -283,7 +287,7 @@ void	ft_checkwalls(t_game *game)
 	while (i < len)
 	{
 		if (!ft_strchr("NESW102", game->map.data[i]))
-			ft_exit(game, "Error", 1);
+			ft_exit(game, "Map contains forbiden chars", 1);
 		i++;
 	}
 }
@@ -298,7 +302,7 @@ void	ft_checkrules(t_game *game, int x, int y)
 	while (counter < 8)
 	{
 		if (!ft_get_xy(&game->map, x + arr[counter][0], y + arr[counter][1]))
-			game->param.error = 37;
+			ft_exit(game, "Map is not ", 1);
 		counter++;
 	}
 }
@@ -346,8 +350,8 @@ int	pars_processing(t_game *game)
 	if (fd == -1)
 		ft_exit(game, "Not find map", 1);
 	pars_param(game, fd);
-	if (game->param.ismap != 1)
-		ft_exit(game, "OSHIBKA", 1);
+	// if (game->param.ismap != 1)
+	// 	ft_exit(game, "OSHIBKA", 1);
 	ft_parsmap(game, fd);
 	game->map.data = ft_calloc(game->map.width, game->map.height);
 	if (!(game->map.data))

@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 18:19:38 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/30 02:02:33 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,6 @@
 # define KEY_E 14
 # define KEY_LEFT 123
 # define KEY_RIGHT 124
-
-# define arrf {{"NO ", ft_cpath, &game->param.pth_no}, {"SO ", ft_cpath, &game->param.pth_so},	\
-	{"WE ", ft_cpath, &game->param.pth_we} , {"EA ", ft_cpath, &game->param.pth_ea}, {"S ", ft_cpath, &game->param.pth_s},	\
-	{"F ", ft_pars_color, &game->param.floor}, {"C ", ft_pars_color, &game->param.ceil}, {"R ", ft_pars_screen, 0}, {0, 0, 0}}
 
 typedef struct		s_color
 {

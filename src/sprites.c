@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/26 18:58:54 by telron            #+#    #+#             */
-/*   Updated: 2021/04/29 18:33:39 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/29 23:03:29 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,7 @@ void	ft_sprite_vert_render(t_game *game, t_sprite *sprite, \
 	float	yy_otn;
 
 	counter = 0;
-	pixel_count = game->param.screen.height * atan(0.5 / sprite->vector.distance) \
-		* 2 / (M_PI / 3);
+	pixel_count = game->param.screen.height / sprite->vector.distance;
 	yy_centr = game->param.screen.height / 2;
 	icord.yy = yy_centr - pixel_count / 2;
 	while (counter < pixel_count)

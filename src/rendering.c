@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 14:00:22 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 18:40:44 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/30 01:16:13 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ void	ft_render_vertical(t_game *game, t_vector *vector, size_t xx)
 	float	xx_otn;
 	float	yy_otn;
 
-	vector->distance = vector->distance * cos(vector->cord.direction * 1.5);
+	// printf("%f\n", game->player.direction);
+	// printf("%f %f %f\n", vector->cord.direction, game->player.direction, vector->distance);
 	pixel_count = game->param.screen.height / vector->distance;
 	yy = (game->param.screen.height - pixel_count) / 2;
 	counter = pixel_count;

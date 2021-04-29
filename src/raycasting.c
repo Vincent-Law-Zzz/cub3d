@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/29 10:21:39 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 18:30:46 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/30 01:58:54 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,8 +189,8 @@ void	ft_ray(t_game *game, t_vector *vector)
 	if (!ft_is_wall(game, vector))
 		ft_ray(game, vector);
 	else
-		vector->distance = sqrt(pow(game->player.xx- vector->cord.xx, 2) +\
-							pow(game->player.yy - vector->cord.yy, 2));
+		vector->distance = (sqrt(pow(game->player.xx- vector->cord.xx, 2) +\
+							pow(game->player.yy - vector->cord.yy, 2)));
 	if (vector->distance < 0.2)
 		game->stop = 1;
 }
