@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:55:02 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/30 02:02:33 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/30 03:18:41 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,22 @@ typedef	struct		s_param
 	int				ismap;
 	int				error;
 }					t_param;
+
+typedef struct 		s_cross
+{
+	float	crossx1;
+	float	crossy1;
+	float	crossx2;
+	float	crossy2;
+	float	x1; 
+	float	y1;
+	float	x2;
+	float	y2;
+	float	x3;
+	float	y3;
+	float	x4;
+	float	y4;
+}					t_cross;
 
 typedef	struct		s_map
 {

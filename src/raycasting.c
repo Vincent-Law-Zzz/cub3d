@@ -6,7 +6,7 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/29 10:21:39 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/30 01:58:54 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/04/29 21:31:42 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,30 +45,30 @@ float	ft_to_diap(float value)
 	return (value);
 }
 
-int	ft_cross(t_cord *crossing, float x1, float y1, float x2, float y2, float x3, float y3, t_cord *cord4)
+int	ft_cross(t_cord *cord, t_cross *o)
 {
 	float	q;
 	float	n;
 	float	sn;
 	float	fn;
 
-	if (y2 - y1 != 0)
+	if (o->y2 - o->y1 != 0)
 	{
-		q = (x2 - x1) / (y1 - y2);
-		sn = (x3 - cord4->xx) + (y3 - cord4->yy) * q;
+		q = (o->x2 - o->x1) / (o->y1 - o->y2);
+		sn = (o->x3 - o->x4) + (o->y3 - o->y4) * q;
 		if (!sn)
 			return (0);
-		fn = (x3 - x1) + (y3 - y1) * q;
+		fn = (o->x3 - o->x1) + (o->y3 - o->y1) * q;
 		n = fn / sn;
 	}
 	else
 	{
-		if (!(y3 - cord4->yy))
+		if (!(o->y3 - o->y4))
 			return (0);
-		n = (y3 - y1) / (y3 - cord4->yy);
+		n = (o->y3 - o->y1) / (o->y3 - o->y4);
 	}
-	crossing->xx = x3 + (cord4->xx - x3) * n;
-	crossing->yy = y3 + (cord4->yy - y3) * n;
+	cord->xx = o->x3 + (o->x4 - o->x3) * n;
+	cord->yy = o->y3 + (o->y4 - o->y3) * n;
 	return (1);
 }
 
@@ -120,77 +120,140 @@ float	ft_get_distance(t_cord *dest, t_cord *source)
 	return(sqrt(pow(source->xx - dest->xx, 2) + pow(source->yy - dest->yy, 2)));
 }
 
-void	ft_ray(t_game *game, t_vector *vector)
+void	raycast_025(t_cross *o, t_vector *vector, t_cord *cord)
 {
-	t_cord	cord[3];
-
-	cord[2].xx = vector->cord.xx + 2 * cosf(ft_to_diap(-0.25 + vector->cord.direction) * M_PI * 2);
-	cord[2].yy = vector->cord.yy + 2 * sinf(ft_to_diap(-0.25 + vector->cord.direction) * M_PI * 2);
-	if (vector->cord.direction < 0.25)
+	o->x1 = floor(vector->cord.xx); 
+	o->y1 = ft_floor_or_min(vector->cord.yy);
+	o->x2 = floor(vector->cord.xx);
+	o->y2 = ft_floor_or_min(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[0], o);
+	o->x1 = ft_ceilf_or_add(vector->cord.xx); 
+	o->y1 = ft_floor_or_min(vector->cord.yy);
+	o->x2 = ft_ceilf_or_add(vector->cord.xx);
+	o->y2 = ft_ceilf_or_add(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[1], o);
+	if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
 	{
-		ft_cross(cord, floor(vector->cord.xx), ft_floor_or_min(vector->cord.yy), floor(vector->cord.xx), ft_floor_or_min(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		ft_cross(cord + 1, ft_ceilf_or_add(vector->cord.xx), ft_floor_or_min(vector->cord.yy), ft_ceilf_or_add(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
-		{
-			ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
-			vector->dirtxtr = 0;
-		}
-		else
-		{
-			ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
-			vector->dirtxtr = 1;
-		}
-	}
-	else if (vector->cord.direction < 0.5)
-	{
-		ft_cross(cord, ft_ceilf_or_add(vector->cord.xx), floor(vector->cord.yy), ft_ceilf_or_add(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		ft_cross(cord + 1, ft_ceilf_or_add(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), floor(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
-		{
-			ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
-			vector->dirtxtr = 1;
-		}
-		else
-		{
-			ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
-			vector->dirtxtr = 2;
-		}
-	}
-	else if (vector->cord.direction < 0.75)
-	{
-		ft_cross(cord, ceilf(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), ft_floor_or_min(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		ft_cross(cord + 1, ft_floor_or_min(vector->cord.xx), ft_ceilf_or_add(vector->cord.yy), ft_floor_or_min(vector->cord.xx), ft_floor_or_min(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
-		{
-			ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
-			vector->dirtxtr = 2;
-		}
-		else
-		{
-			ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
-			vector->dirtxtr = 3;
-		}
+		ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
+		vector->dirtxtr = 0;
 	}
 	else
 	{
-		ft_cross(cord, ft_floor_or_min(vector->cord.xx), ceilf(vector->cord.yy), ft_floor_or_min(vector->cord.xx), ft_floor_or_min(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		ft_cross(cord + 1, ft_floor_or_min(vector->cord.xx), ft_floor_or_min(vector->cord.yy), ceilf(vector->cord.xx), ft_floor_or_min(vector->cord.yy), vector->cord.xx, vector->cord.yy, cord + 2);
-		if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
-		{
-			ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
-			vector->dirtxtr = 3;
-		}
-		else
-		{
-			ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
-			vector->dirtxtr = 0;
-		}
+		ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
+		vector->dirtxtr = 1;
 	}
+}
+
+void	raycast_05(t_cross *o, t_vector *vector, t_cord *cord)
+{
+	o->x1 = ft_ceilf_or_add(vector->cord.xx); 
+	o->y1 = floor(vector->cord.yy);
+	o->x2 = ft_ceilf_or_add(vector->cord.xx);
+	o->y2 = ft_ceilf_or_add(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[0], o);
+	o->x1 = ft_ceilf_or_add(vector->cord.xx); 
+	o->y1 = ft_ceilf_or_add(vector->cord.yy);
+	o->x2 = floor(vector->cord.xx);
+	o->y2 = ft_ceilf_or_add(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[1], o);
+	if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
+	{
+		ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
+		vector->dirtxtr = 1;
+	}
+	else
+	{
+		ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
+		vector->dirtxtr = 2;
+	}
+}
+
+void	raycast_075(t_cross *o, t_vector *vector, t_cord *cord)
+{
+	o->x1 = ceilf(vector->cord.xx); 
+	o->y1 = ft_ceilf_or_add(vector->cord.yy);
+	o->x2 = ft_floor_or_min(vector->cord.xx);
+	o->y2 = ft_ceilf_or_add(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[0], o);
+	o->x1 = ft_floor_or_min(vector->cord.xx); 
+	o->y1 = ft_ceilf_or_add(vector->cord.yy);
+	o->x2 = ft_floor_or_min(vector->cord.xx);
+	o->y2 = ft_floor_or_min(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[1], o);
+	if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
+	{
+		ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
+		vector->dirtxtr = 2;
+	}
+	else
+	{
+		ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
+		vector->dirtxtr = 3;
+	}
+}
+
+void	raycast_1(t_cross *o, t_vector *vector, t_cord *cord)
+{
+	o->x1 = ft_floor_or_min(vector->cord.xx); 
+	o->y1 = ceilf(vector->cord.yy);
+	o->x2 = ft_floor_or_min(vector->cord.xx);
+	o->y2 = ft_floor_or_min(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[0], o);
+	o->x1 = ft_floor_or_min(vector->cord.xx); 
+	o->y1 = ft_floor_or_min(vector->cord.yy);
+	o->x2 = ceilf(vector->cord.xx);
+	o->y2 = ft_floor_or_min(vector->cord.yy);
+	o->x3 = vector->cord.xx;
+	o->y3 = vector->cord.yy;
+	ft_cross(&cord[1], o);
+	if (ft_get_distance(&vector->cord, cord) < ft_get_distance(&vector->cord, cord + 1))
+	{
+		ft_memcpy(&vector->cord, &cord[0], sizeof(float) * 2);
+		vector->dirtxtr = 3;
+	}
+	else
+	{
+		ft_memcpy(&vector->cord, &cord[1], sizeof(float) * 2);
+		vector->dirtxtr = 0;
+	}
+}
+
+void	ft_ray(t_game *game, t_vector *vector)
+{
+	t_cross	o;
+	t_cord	cord[2];
+	
+	o.x4 = vector->cord.xx + 2 * 
+	cosf(ft_to_diap(-0.25 + vector->cord.direction) * M_PI * 2);
+	o.y4 = vector->cord.yy + 2 * 
+	sinf(ft_to_diap(-0.25 + vector->cord.direction) * M_PI * 2);
+	if (vector->cord.direction < 0.25)
+		raycast_025(&o, vector, cord);
+	else if (vector->cord.direction < 0.5)
+		raycast_05(&o, vector, cord);
+	else if (vector->cord.direction < 0.75)
+		raycast_075(&o, vector, cord);
+	else
+		raycast_1(&o, vector, cord);
 	if (!ft_is_wall(game, vector))
 		ft_ray(game, vector);
 	else
 		vector->distance = (sqrt(pow(game->player.xx- vector->cord.xx, 2) +\
-							pow(game->player.yy - vector->cord.yy, 2)));
+			pow(game->player.yy - vector->cord.yy, 2)));
 	if (vector->distance < 0.2)
 		game->stop = 1;
 }
