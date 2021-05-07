@@ -6,11 +6,22 @@
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/25 14:00:22 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/30 05:36:57 by aapollo          ###   ########.fr       */
+/*   Updated: 2021/05/07 04:13:44 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub_header.h"
+
+t_color	ft_shadow(t_game *game, t_color color, float distanse)
+{
+	float	coef;
+
+	coef = 1 - game->acid + distanse * 0.2;
+	color.R /= coef;
+	color.G /= coef;
+	color.B /= coef;
+	return (color);
+}
 
 t_color	ft_get_pixel(t_game *game, char dirtxtr, float xx_otn, float yy_otn)
 {
@@ -26,6 +37,10 @@ t_color	ft_get_pixel(t_game *game, char dirtxtr, float xx_otn, float yy_otn)
 		texture = &game->param.we;
 	else
 		texture = &game->param.s;
+	if (dirtxtr == 2 || dirtxtr == 3)
+		xx_otn = 1.0 - xx_otn;
+	if (xx_otn == 1.0)
+		xx_otn = 0.0;
 	return (texture->data[(int)(yy_otn * texture->height) *texture->width + \
 		(int)(xx_otn * texture->width)]);
 }
@@ -36,11 +51,6 @@ void	ft_set_xx_otn(t_vector *vector, float *xx_otn)
 		*xx_otn = vector->cord.yy - floor(vector->cord.yy);
 	else
 		*xx_otn = vector->cord.xx - floor(vector->cord.xx);
-}
-
-float	ft_del_fish_eye(float coef_screen, float player_dir)
-{
-	return (cos(player_dir - coef_screen));
 }
 
 void	ft_render_vertical(t_game *game, t_vector *vector, size_t xx)
@@ -60,7 +70,8 @@ void	ft_render_vertical(t_game *game, t_vector *vector, size_t xx)
 		yy_otn = (float)(pixel_count - counter) / (float)pixel_count;
 		if (xx_otn >= 0 && xx_otn < 1 && yy_otn >= 0 && yy_otn < 1 && yy >= 0)
 			game->param.screen.data[yy * game->param.screen.width + xx] = \
-				ft_get_pixel(game, vector->dirtxtr, xx_otn, yy_otn);
+				ft_shadow(game, ft_get_pixel(game, vector->dirtxtr, xx_otn, \
+					yy_otn), vector->distance);
 		yy++;
 	}
 }

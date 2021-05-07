@@ -11,7 +11,8 @@ LIBS_ADD =	-L ./mlx/ -L ./libft42/ -lft -lmlx -framework OpenGL -framework AppKi
 CFLAGS = -Wall -Wextra -Werror -O3 ${INCLUDES}
 
 SRCS = 	$(addprefix ./src/,\
-				main.c parsing.c event.c raycasting.c rendering.c sprites.c screen.c minimap.c\
+				cast_tools.c caster.c event.c exit.c main.c map_validation.c minimap.c param_proc.c \
+				pars_map.c pars_param.c parsing.c raycasting.c rendering.c screen.c sprite_tools.c sprites.c\
 		)
 
 OBJS = $(SRCS:.c=.o)
@@ -30,8 +31,13 @@ tools:
 
 clean:
 		rm -f ${OBJS}
+		rm -f Screenshot.bmp
+		make -C ./libft42/ clean
+		make -C ./mlx/ clean
 
 fclean:	clean
 		rm -f ${NAME} 
+		make -C ./libft42/ fclean
+		make -C ./mlx/ fclean
 
 re: fclean all

@@ -5,26 +5,16 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/04/29 10:37:49 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 20:32:29 by aapollo          ###   ########.fr       */
+/*   Created: 2021/05/03 20:48:04 by aapollo           #+#    #+#             */
+/*   Updated: 2021/05/07 03:52:42 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub_header.h"
 
-// void	ft_free_vctrs(t_game *game, t_vector *vectors)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	while (i < game->param.screen.width)
-// 	{
-// 		free(vectors[i].cord)
-// 	}
-// }
 int	ft_loop_tick(t_game *game)
 {
-	game->vectors = malloc((size_t)game->param.screen.width* \
+	game->vectors = malloc((size_t)game->param.screen.width * \
 		sizeof(t_vector));
 	if (!game->vectors)
 		ft_exit(game, "No memory allocated for rays", 1);
@@ -65,12 +55,10 @@ int	main(int argc, char **argv)
 			game.param.screen.height, "Sanya Cub");
 	else
 		ft_exit(&game, "small screen size parameters", 1);
-	if (argc == 3)
-	{
-		if (!ft_strncmp(argv[2], "--save", 7))
-			ft_create_screen(&game);
-		ft_exit(&game, "Bad 3 param!", 1);
-	}
+	if (argc == 3 && !ft_strncmp(argv[2], "--save", 7))
+		ft_create_screen(&game);
+	else if (argc >= 3)
+		ft_exit(&game, "write --save to take a snapshot", 1);
 	mlx_do_key_autorepeatoff(game.mlx);
 	mlx_hook(game.window, 2, 0, handle_pressed_key, &game);
 	mlx_loop_hook(game.mlx, ft_loop_tick, &game);

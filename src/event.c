@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aapollo <aapollo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/04/25 02:11:34 by aapollo           #+#    #+#             */
-/*   Updated: 2021/04/29 20:37:05 by aapollo          ###   ########.fr       */
+/*   Created: 2021/05/03 20:47:47 by aapollo           #+#    #+#             */
+/*   Updated: 2021/05/07 04:38:31 by aapollo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ int	handle_pressed_key(int keycode, t_game *game)
 		game->event.q = 1;
 	if ((keycode == KEY_RIGHT || keycode == KEY_E) && !game->event.right)
 		game->event.e = 1;
+	if (keycode == KEY_F && game->event.f != 1)
+		game->event.f = 1;
+	else if (keycode == KEY_F && game->event.f == 1)
+		game->event.f = 0;
 	if ((game->event.down || game->event.left || game->event.right) \
 		&& !game->event.up)
 		game->stop = 0;
@@ -62,7 +66,7 @@ void	ft_player_move(t_game *game)
 		(game->event.up - game->event.down);
 	yy_delta = (1 - game->stop) * sin((dir - 0.25) * M_PI * 2) * PLAYER_V * \
 		(game->event.up - game->event.down);
-	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta), \
+	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta * 1.6), \
 		(int)(game->player.yy + yy_delta)) == '0')
 	{
 		game->player.xx += xx_delta;
@@ -72,7 +76,7 @@ void	ft_player_move(t_game *game)
 		(game->event.left - game->event.right);
 	yy_delta = (1 - game->stop) * sin((dir - 0.5) * M_PI * 2) * PLAYER_V * \
 		(game->event.left - game->event.right);
-	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta), \
+	if (ft_get_xy(&game->map, (int)(game->player.xx + xx_delta * 1.6), \
 		(int)(game->player.yy + yy_delta)) == '0')
 	{
 		game->player.xx += xx_delta;
@@ -80,9 +84,24 @@ void	ft_player_move(t_game *game)
 	}
 }
 
+void	ft_music(t_game *game)
+{
+	if (game->event.f == 1 && game->acid != 1)
+	{
+		game->acid = 1;
+		system("afplay ./src/music.mp3 &");
+	}
+	if (game->event.f == 0 && game->acid == 1)
+	{
+		game->acid = 0;
+		system("killall afplay");
+	}
+}
+
 void	ft_event_processing(t_game *game)
 {
 	ft_player_move(game);
+	ft_music(game);
 	if (game->event.q)
 	{
 		game->player.direction = ft_to_diap(game->player.direction - ROT_V);
